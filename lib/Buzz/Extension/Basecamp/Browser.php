@@ -33,6 +33,38 @@ class Browser extends BaseBrowser
         parent::__construct($client, $journal);
     }
 
+    // messages
+
+    public function getMessages($projectId, $categoryId = null)
+    {
+        $request = $this->createRequest();
+        $request->setResource($categoryId
+            ? sprintf('/projects/%d/cat/%d/posts.xml', $projectId, $categoryId)
+            : sprintf('/projects/%d/posts.xml', $projectId));
+
+        $response = $this->send($request);
+    }
+
+    public function getMessage($id)
+    {
+        $request = $this->createRequest();
+        $request->setResource(sprintf('/posts/%d.xml', $id));
+
+        $response = $this->send($request);
+    }
+
+    public function getArchivedMessages($projectId, $categoryId = null)
+    {
+        $request = $this->createRequest();
+        $request->setResource($categoryId
+            ? sprintf('/projects/%d/cat/%d/posts/archive.xml', $projectId, $categoryId)
+            : sprintf('/projects/%d/posts/archive.xml', $projectId));
+
+        $response = $this->send($request);
+    }
+
+    // internal
+
     /** {@inheritDoc} */
     public function send(Request $request, Response $response = null)
     {
