@@ -2,7 +2,7 @@
 
 namespace Buzz\Extension\UPS\Resource;
 
-class Address
+class Address implements AddressInterface
 {
     private $city;
     private $stateProvinceCode;
