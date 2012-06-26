@@ -1,0 +1,67 @@
+<?php
+
+namespace Buzz\Extension\Gdata\Contacts;
+
+use Buzz\Browser as BaseBrowser;
+use Buzz\Client\ClientInterface;
+use Buzz\Extension\Gdata\Contacts\Resource\Contact;
+use Buzz\Message\Factory\FactoryInterface;
+use Buzz\Util\Url;
+
+class Browser extends BaseBrowser
+{
+    private $accessToken;
+
+    public function __construct($accessToken = null, ClientInterface $client = null, FactoryInterface $factory = null)
+    {
+        parent::__construct($client, $factory);
+
+        $this->accessToken = $accessToken;
+    }
+
+    public function setAccessToken($accessToken)
+    {
+        $this->accessToken = $accessToken;
+    }
+
+    public function all($email = 'default')
+    {
+        return $this->loadContacts(new Url('https://www.google.com/m8/feeds/contacts/'.$email.'/full?max-results=50'));
+    }
+
+    private function loadContacts(Url $url, array $contacts = array())
+    {
+        $request = $this->getMessageFactory()->createRequest();
+        $url->applyToRequest($request);
+
+        if ($this->accessToken) {
+            $request->addHeader('Authorization: Bearer '.$this->accessToken);
+        }
+
+        $response = $this->send($request);
+
+        if (200 !== $response->getStatusCode()) {
+            throw new \RuntimeException($response->getReasonPhrase());
+        }
+
+        $feed = new \SimpleXMLElement($response->getContent());
+        $feed->registerXPathNamespace('atom', 'http://www.w3.org/2005/Atom');
+        $feed->registerXPathNamespace('gdata', 'http://schemas.google.com/g/2005');
+
+        foreach ($feed->xpath('./atom:entry[atom:title and gdata:email[@address]]') as $entry) {
+            $entry->registerXPathNamespace('gdata', 'http://schemas.google.com/g/2005');
+            $email = $entry->xpath('./gdata:email');
+
+            $contacts[] = new Contact((string) $entry->title, (string) $email[0]['address']);
+        }
+
+        $next = $feed->xpath('./atom:link[@rel="next"]');
+
+        if (!isset($next[0]['href'])) {
+            // all done
+            return $contacts;
+        }
+
+        return $this->loadContacts(new Url((string) $next[0]['href']), $contacts);
+    }
+}
