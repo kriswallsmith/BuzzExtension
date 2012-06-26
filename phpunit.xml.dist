@@ -8,7 +8,6 @@
     </testsuites>
 
     <php>
-        <!-- <server name="BUZZ_DIR" value="/path/to/buzz/lib" /> -->
         <!-- <server name="UPS_ACCESS_LICENSE_NUMBER" value="" /> -->
         <!-- <server name="UPS_USER_ID" value="" /> -->
         <!-- <server name="UPS_PASSWORD" value="" /> -->

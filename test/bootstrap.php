@@ -1,21 +1,15 @@
 <?php
 
-if (!isset($_SERVER['BUZZ_DIR'])) {
-    throw new RuntimeException('You must specify a BUZZ_DIR environment variable.');
+if (!$loader = @include __DIR__.'/../vendor/autoload.php') {
+    echo <<<EOM
+You must set up the project dependencies by running the following commands:
+
+    curl -s http://getcomposer.org/installer | php
+    php composer.phar install
+
+EOM;
+
+    exit(1);
 }
 
-spl_autoload_register(function($class)
-{
-    if (0 === strpos($class, 'Buzz\\Extension\\')) {
-        $dir = __DIR__.'/../lib';
-    } elseif (0 === strpos($class, 'Buzz\\')) {
-        $dir = $_SERVER['BUZZ_DIR'];
-    } else {
-        return false;
-    }
-
-    if (file_exists($file = $dir.'/'.str_replace('\\', '/', $class).'.php')) {
-        require_once $file;
-        return true;
-    }
-});
+$loader->add('Buzz\Test\Extension', __DIR__);
