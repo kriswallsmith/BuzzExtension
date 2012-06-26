@@ -42,6 +42,9 @@ class RatingRequestTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('https://wwwcie.ups.com', $request->getHost(), '->getHost() defaults to the testing host');
     }
 
+    /**
+     * @group integration
+     */
     public function testSend()
     {
         $browser = $this->createBrowser();
