@@ -2,13 +2,11 @@
 
 namespace Buzz\Extension\UPS\Request;
 
-use Buzz\Browser;
-use Buzz\BrowserAwareInterface;
-use Buzz\Extension\UPS\Browser as UpsBrowser;
+use Buzz\Extension\UPS\Browser;
 use Buzz\Extension\UPS\Resource\AddressInterface;
 use Buzz\Message\Request;
 
-class RatingRequest extends Request implements BrowserAwareInterface
+class RatingRequest extends Request implements UpsRequestInterface
 {
     const URL_TEST = 'https://wwwcie.ups.com/ups.app/xml/Rate';
     const URL_PROD = 'https://onlinetools.ups.com/ups.app/xml/Rate';
@@ -35,13 +33,19 @@ class RatingRequest extends Request implements BrowserAwareInterface
         $this->fromUrl($url ?: static::URL_TEST);
     }
 
-    public function setBrowser(Browser $browser)
+    public function setAccessLicenseNumber($accessLicenseNumber)
     {
-        if ($browser instanceof UpsBrowser) {
-            $this->accessLicenseNumber = $browser->getAccessLicenseNumber();
-            $this->userId = $browser->getUserId();
-            $this->password = $browser->getPassword();
-        }
+        $this->accessLicenseNumber = $accessLicenseNumber;
+    }
+
+    public function setUserId($userId)
+    {
+        $this->userId = $userId;
+    }
+
+    public function setPassword($password)
+    {
+        $this->password = $password;
     }
 
     public function setShipperNumber($shipperNumber)
