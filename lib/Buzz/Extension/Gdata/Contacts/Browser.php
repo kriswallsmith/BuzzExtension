@@ -24,9 +24,9 @@ class Browser extends BaseBrowser
         $this->accessToken = $accessToken;
     }
 
-    public function all($email = 'default')
+    public function all($email = 'default', $maxResults = 2000)
     {
-        return $this->loadContacts(new Url('https://www.google.com/m8/feeds/contacts/'.$email.'/full?max-results=500'));
+        return $this->loadContacts(new Url('https://www.google.com/m8/feeds/contacts/'.$email.'/full?max-results='.$maxResults));
     }
 
     private function loadContacts(Url $url, array $contacts = array())
