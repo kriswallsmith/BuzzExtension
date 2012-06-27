@@ -26,7 +26,7 @@ class Browser extends BaseBrowser
 
     public function all($email = 'default')
     {
-        return $this->loadContacts(new Url('https://www.google.com/m8/feeds/contacts/'.$email.'/full?max-results=50'));
+        return $this->loadContacts(new Url('https://www.google.com/m8/feeds/contacts/'.$email.'/full?max-results=500'));
     }
 
     private function loadContacts(Url $url, array $contacts = array())
