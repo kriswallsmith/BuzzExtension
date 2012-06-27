@@ -49,15 +49,22 @@ class Browser extends BaseBrowser
         $feed->registerXPathNamespace('gdata', 'http://schemas.google.com/g/2005');
 
         foreach ($feed->xpath('./atom:entry[atom:title and gdata:email[@address]]') as $entry) {
+            $entry->registerXPathNamespace('atom', 'http://www.w3.org/2005/Atom');
             $entry->registerXPathNamespace('gdata', 'http://schemas.google.com/g/2005');
+
             $email = $entry->xpath('./gdata:email');
 
-            $contacts[] = new Contact((string) $entry->title, (string) $email[0]['address']);
+            $contacts[] = $contact = new Contact(
+                (string) $entry->title,
+                (string) $email[0]['address']
+            );
+
+            if ($this->accessToken && $photo = $entry->xpath('./atom:link[@rel="http://schemas.google.com/contacts/2008/rel#photo" and @href]')) {
+                $contact->setPhoto((string) $photo[0]['href'].'?access_token='.rawurlencode($this->accessToken));
+            }
         }
 
-        $next = $feed->xpath('./atom:link[@rel="next"]');
-
-        if (!isset($next[0]['href'])) {
+        if (!$next = $feed->xpath('./atom:link[@rel="next" and @href]')) {
             // all done
             return $contacts;
         }
